@@ -8,3 +8,7 @@ flutter 활용이유: window,linux,macos 크로스컴파일을 지원하며, qt�
 2차 목표 
 1. macos hook(? window detour 같은 hooking)
 2. macos환경에서 화면 캡쳐 및 서버로 전송. key event 처리
+
+==
+2022.08.18
+1. material 대신 fluent_ui 를 사용
