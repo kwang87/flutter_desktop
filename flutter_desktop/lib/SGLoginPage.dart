@@ -2,6 +2,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'dart:async';
 //import 'package:desktop_window/desktop_window.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
+import 'package:flutter/material.dart' as materials;
 import 'package:window_manager/window_manager.dart';
 /*
 Future testWindowFunctions() async {
@@ -10,21 +11,11 @@ Future testWindowFunctions() async {
   await DesktopWindow.setMinWindowSize(const Size(362, 329));
 }*/
 
-Future testWindowFunctions2() async {
-  const initialSize = Size(362, 329);
-  appWindow.minSize = initialSize;
-  //appWindow.maxSize = initialSize;
-  appWindow.size = initialSize;
-  appWindow.alignment = Alignment.center;
-  appWindow.show();
-}
-
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    testWindowFunctions2();
     return const FluentApp(
       title: 'Flutter Demo',
       home: MyHomePage(),
@@ -90,7 +81,7 @@ class WindowButtons extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.white,
+      color: Color.fromARGB(255, 245, 245, 245),
       child: Row(
         //mainAxisAlignment: MainAxisAlignment.end,
         children: [
@@ -128,7 +119,7 @@ class LoginTitleBar extends MoveWindow {
   Widget build(BuildContext context) {
     return Container(
       width: 200,
-      color: Colors.green,
+      color: Color.fromARGB(255, 0, 255, 0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
@@ -142,19 +133,10 @@ class LoginTitleBar extends MoveWindow {
   }
 }
 
-class _SGLoginState extends State<MyHomePage> with WindowListener {
-  String _notiMessage = "test noti";
-
-  @override
-  void onWindowResize() {
-    print('resize!!!!');
-    setState(() {});
-  }
-
-  SizedBox titleBox = SizedBox();
-
-  Widget CreateSGStyleTitleBar() {
-    return Row(
+Widget CreateSGStyleTitleBar() {
+  return Container(
+    color: Color.fromARGB(255, 245, 245, 245),
+    child: Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         SizedBox(
@@ -163,40 +145,91 @@ class _SGLoginState extends State<MyHomePage> with WindowListener {
         Image.asset(
           'assets/images/am_logo.png',
         ),
-        FittedBox(
-          //fit: BoxFit.fill,
-          child: SizedBox(
-            width: appWindow.rect.width - 13 - 16 - (30 * 3),
-            height: 35,
-            child: Container(
-              color: Color.fromARGB(255, 0x42, 0x42, 0x42),
-              child: Column(
-                children: [
-                  WindowTitleBarBox(child: MoveWindow()),
-                  Expanded(child: Container())
-                ],
+        Flexible(
+          child: FittedBox(
+            fit: BoxFit.fill,
+            child: SizedBox(
+              width: appWindow.rect.width - 13 - 16 - (34 * 3),
+              height: 35,
+              child: Container(
+                color: Color.fromARGB(255, 245, 245, 245),
+                child: Column(
+                  children: [
+                    WindowTitleBarBox(child: MoveWindow()),
+                    Expanded(child: Container())
+                  ],
+                ),
               ),
             ),
           ),
         ),
         WindowButtons(),
       ],
-    );
+    ),
+  );
+}
+
+class _SGLoginState extends State<MyHomePage> with WindowListener {
+  String _notiMessage = "test not1234i\ntest\n123124";
+  TextEditingController loginIDcontroller = new TextEditingController();
+
+  @override
+  void initState() {
+    windowManager.addListener(this);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    windowManager.removeListener(this);
+    super.dispose();
+  }
+
+  @override
+  void onWindowEvent(String eventName) {
+    print('[WindowManager] onWindowEvent: $eventName');
+  }
+
+  @override
+  void onWindowResize() {
+    setState(() {});
+  }
+
+  void displayNotiMessage(String msg) {
+    _notiMessage = msg;
+    setState(() {});
+  }
+
+  BorderSide _kDefaultRoundedBorderSide = BorderSide(
+    style: BorderStyle.solid,
+    width: 0.8,
+  );
+
+  Future LoginPageRect(double w, double h) async {
+    final initialSize = Size(w, h);
+    appWindow.minSize = initialSize;
+    //appWindow.maxSize = initialSize;
+    appWindow.size = initialSize;
+    appWindow.alignment = Alignment.center;
+    appWindow.show();
   }
 
   @override
   Widget build(BuildContext context) {
+    LoginPageRect(362, 339);
     return FluentApp(
       title: "fluent ui title test",
       debugShowCheckedModeBanner: false,
       home: Container(
-        color: Colors.white,
+        width: 362,
+        color: Color.fromARGB(255, 255, 255, 255),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Container(
                 decoration: BoxDecoration(
                     border: Border.all(
-                        width: 1, color: Color.fromARGB(255, 194, 194, 194))),
+                        width: 1, color: Color.fromARGB(255, 170, 170, 170))),
                 child: CreateSGStyleTitleBar()),
             Container(
               padding: const EdgeInsets.only(
@@ -204,14 +237,75 @@ class _SGLoginState extends State<MyHomePage> with WindowListener {
               child: Column(children: [
                 Image.asset(
                   'assets/images/login_logo.png',
-                  height: 60,
-                  width: 312,
+                  //height: 60,
+                  //width: 312,
                   fit: BoxFit.fitWidth,
                 ),
                 Container(
-                  color: Colors.white,
+                  //height: 32,
+                  color: Color.fromARGB(255, 255, 255, 255), // Colors.white,
                   child: Text('$_notiMessage'),
-                )
+                ),
+                TextBox(
+                  controller: loginIDcontroller,
+                  minHeight: 40,
+                  placeholder: 'Input Login ID',
+                  textAlignVertical: TextAlignVertical.center,
+                  prefix: Image.asset(
+                    'assets/images/am_logo.png',
+                  ),
+                  decoration: BoxDecoration(
+                      border: Border(
+                        top: _kDefaultRoundedBorderSide,
+                        bottom: _kDefaultRoundedBorderSide,
+                        left: _kDefaultRoundedBorderSide,
+                        right: _kDefaultRoundedBorderSide,
+                      ),
+                      borderRadius:
+                          BorderRadius.vertical(top: Radius.circular(3.0))),
+                ),
+                const SizedBox(
+                  height: 14,
+                ),
+                TextBox(
+                  minHeight: 40,
+                  placeholder: 'Input Login Password',
+                  textAlignVertical: TextAlignVertical.center,
+                  prefix: Row(
+                    children: [
+                      const SizedBox(
+                        width: 5,
+                      ),
+                      Image.asset(
+                        'assets/images/am_logo.png',
+                      ),
+                    ],
+                  ),
+                  decoration: BoxDecoration(
+                      border: Border(
+                        top: _kDefaultRoundedBorderSide,
+                        bottom: _kDefaultRoundedBorderSide,
+                        left: _kDefaultRoundedBorderSide,
+                        right: _kDefaultRoundedBorderSide,
+                      ),
+                      borderRadius:
+                          const BorderRadius.all(Radius.circular(7.0))),
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: materials.ElevatedButton(
+                    child: Text("Login", textAlign: TextAlign.center),
+                    onPressed: () => setState(
+                      () {
+                        _notiMessage = loginIDcontroller.text;
+                      },
+                    ),
+                  ),
+                ),
               ]),
             ),
           ],
