@@ -31,22 +31,14 @@ class SGHttpReader {
 
   String currentServerIP = "172.24.11.3";
   int currentServerPort = 8443;
+
   Future<bool> readClientInitConfig() async {
     debugPrint('enter readClientInitConfig');
-    Future<String> response = _callAPI('/api/xml/getClientInitConfig');
+    String response = await _callAPI('/api/xml/getClientInitConfig');
 
-    response.then((val) {
-      // 해당 값을 출력
-      debugPrint('val: $val');
-      SGMaster().parseClientInitConifg(val);
-      return true;
-    }).catchError((error) {
-      // error가 해당 에러를 출력
-      debugPrint('error: $error');
-      return false;
-    });
-
-    return false;
+    debugPrint('val: $response');
+    SGMaster().parseClientInitConifg(response);
+    return true;
   }
 
   String generateRandomString(int len) {

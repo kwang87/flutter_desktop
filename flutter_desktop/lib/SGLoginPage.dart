@@ -180,7 +180,7 @@ Widget CreateSGStyleTitleBar() {
 }
 
 class _SGLoginState extends State<MyHomePage> with WindowListener {
-  String _notiMessage = "test not1234i\ntest\n123124";
+  String _notiMessage = "";
   TextEditingController loginIDcontroller = new TextEditingController();
   TextEditingController loginPwdcontroller = new TextEditingController();
 
@@ -215,7 +215,7 @@ class _SGLoginState extends State<MyHomePage> with WindowListener {
       // error가 해당 에러를 출력
       print('error: $error');
     });
-
+    print("init #1");
     super.initState();
   }
 
@@ -264,6 +264,9 @@ class _SGLoginState extends State<MyHomePage> with WindowListener {
     if (readclientID == false) {
       return;
     }
+    print(SGMaster().obClientConfig.autoUpdateUse);
+    print(SGMaster().obClientConfig.callSSOActiveXUrlYN);
+    print(SGMaster().obClientConfig.clientDebugMode);
 
     // bool readInit = await SGHttpReader().readClientInitConfig();
     // print("build...!!$readInit");
@@ -309,14 +312,15 @@ class _SGLoginState extends State<MyHomePage> with WindowListener {
                     'assets/images/am_logo.png',
                   ),
                   decoration: BoxDecoration(
-                      border: Border(
-                        top: _kDefaultRoundedBorderSide,
-                        bottom: _kDefaultRoundedBorderSide,
-                        left: _kDefaultRoundedBorderSide,
-                        right: _kDefaultRoundedBorderSide,
-                      ),
-                      borderRadius:
-                          BorderRadius.vertical(top: Radius.circular(3.0))),
+                    border: Border(
+                      top: _kDefaultRoundedBorderSide,
+                      bottom: _kDefaultRoundedBorderSide,
+                      left: _kDefaultRoundedBorderSide,
+                      right: _kDefaultRoundedBorderSide,
+                    ),
+                    borderRadius:
+                        BorderRadius.vertical(top: Radius.circular(3.0)),
+                  ),
                 ),
                 const SizedBox(
                   height: 14,
