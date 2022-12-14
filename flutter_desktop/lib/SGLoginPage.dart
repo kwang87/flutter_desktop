@@ -1,14 +1,27 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'dart:async';
+import 'package:desktop_window/desktop_window.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart' as materials;
+import 'package:flutter_desktop/SGMaster.dart';
 import 'package:window_manager/window_manager.dart';
-/*
-Future testWindowFunctions() async {
-  Size size = await DesktopWindow.getWindowSize();
-  print(size);
+import 'SGHttpReader.dart';
+import 'SGLoadingGif.dart';
+
+Future loginPageNormalMode() async {
   await DesktopWindow.setMinWindowSize(const Size(362, 329));
-}*/
+  await DesktopWindow.setWindowSize(const Size(362, 329));
+}
+
+Future loginPageFindPwdSSO() async {
+  await DesktopWindow.setMinWindowSize(const Size(362, 419));
+  await DesktopWindow.setWindowSize(const Size(362, 419));
+}
+
+Future loginPageSSO() async {
+  await DesktopWindow.setMinWindowSize(const Size(362, 379));
+  await DesktopWindow.setWindowSize(const Size(362, 379));
+}
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -169,12 +182,44 @@ Widget CreateSGStyleTitleBar() {
 }
 
 class _SGLoginState extends State<MyHomePage> with WindowListener {
-  String _notiMessage = "test not1234i\ntest\n123124";
+  String _notiMessage = "";
   TextEditingController loginIDcontroller = new TextEditingController();
+  TextEditingController loginPwdcontroller = new TextEditingController();
+
+  final OverlayExample _example = OverlayExample();
 
   @override
   void initState() {
     windowManager.addListener(this);
+
+    Future<bool> readInit = SGHttpReader().readClientInitConfig();
+    print("build...!!");
+    readInit.then((val) {
+      print(SGMaster().obClientConfig.portForProtocol);
+      if (SGMaster().obClientConfig.autoUpdateUse == true) {
+        print("Do Update Check");
+      } else {
+        print("bypass update  check");
+      }
+
+      if (SGMaster().obClientConfig.findPasswordUse == true &&
+          SGMaster().obClientConfig.callSSOActiveXUrlYN == true) {
+        print("find password use");
+        // LoginPageRect(362, 419);
+        loginPageFindPwdSSO();
+      } else if (SGMaster().obClientConfig.findPasswordUse == true ||
+          SGMaster().obClientConfig.callSSOActiveXUrlYN == true) {
+        print("sso login use");
+        loginPageSSO();
+      } else {
+        print("normal");
+        loginPageNormalMode();
+      }
+    }).catchError((error) {
+      // error가 해당 에러를 출력
+      print('error: $error');
+    });
+    print("init #1");
     super.initState();
   }
 
@@ -207,15 +252,39 @@ class _SGLoginState extends State<MyHomePage> with WindowListener {
   Future LoginPageRect(double w, double h) async {
     final initialSize = Size(w, h);
     appWindow.minSize = initialSize;
-    //appWindow.maxSize = initialSize;
+    appWindow.maxSize = initialSize;
     appWindow.size = initialSize;
     appWindow.alignment = Alignment.center;
     appWindow.show();
   }
 
+  Future<void> requestLogin() async {
+    String loginID = loginIDcontroller.text;
+    String loginPWD = loginPwdcontroller.text;
+    SGHttpReader sgReader = SGHttpReader();
+    bool readclientID = await sgReader.requestClientID();
+
+    print('readclientID: $readclientID');
+    if (readclientID == false) {
+      return;
+    }
+    print(SGMaster().obClientConfig.autoUpdateUse);
+    print(SGMaster().obClientConfig.callSSOActiveXUrlYN);
+    print(SGMaster().obClientConfig.clientDebugMode);
+
+    // bool readInit = await SGHttpReader().readClientInitConfig();
+    // print("build...!!$readInit");
+  }
+
+  Widget showLoadingImage() {
+    return Image.asset(
+      'assets/images/system_loading.gif',
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    LoginPageRect(362, 339);
+    _example.context = context;
     return FluentApp(
       title: "fluent ui title test",
       debugShowCheckedModeBanner: false,
@@ -254,19 +323,21 @@ class _SGLoginState extends State<MyHomePage> with WindowListener {
                     'assets/images/am_logo.png',
                   ),
                   decoration: BoxDecoration(
-                      border: Border(
-                        top: _kDefaultRoundedBorderSide,
-                        bottom: _kDefaultRoundedBorderSide,
-                        left: _kDefaultRoundedBorderSide,
-                        right: _kDefaultRoundedBorderSide,
-                      ),
-                      borderRadius:
-                          BorderRadius.vertical(top: Radius.circular(3.0))),
+                    border: Border(
+                      top: _kDefaultRoundedBorderSide,
+                      bottom: _kDefaultRoundedBorderSide,
+                      left: _kDefaultRoundedBorderSide,
+                      right: _kDefaultRoundedBorderSide,
+                    ),
+                    borderRadius:
+                        BorderRadius.vertical(top: Radius.circular(3.0)),
+                  ),
                 ),
                 const SizedBox(
                   height: 14,
                 ),
                 TextBox(
+                  controller: loginPwdcontroller,
                   minHeight: 40,
                   placeholder: 'Input Login Password',
                   textAlignVertical: TextAlignVertical.center,
@@ -297,13 +368,8 @@ class _SGLoginState extends State<MyHomePage> with WindowListener {
                   width: double.infinity,
                   height: 50,
                   child: materials.ElevatedButton(
-                    child: Text("Login", textAlign: TextAlign.center),
-                    onPressed: () => setState(
-                      () {
-                        _notiMessage = loginIDcontroller.text;
-                      },
-                    ),
-                  ),
+                      child: Text("Login", textAlign: TextAlign.center),
+                      onPressed: requestLogin),
                 ),
               ]),
             ),
