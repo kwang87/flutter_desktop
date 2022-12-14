@@ -5,6 +5,7 @@ import 'package:flutter/material.dart' as materials;
 import 'package:flutter_desktop/SGMaster.dart';
 import 'package:window_manager/window_manager.dart';
 import 'SGHttpReader.dart';
+import 'SGLoadingGif.dart';
 
 Future loginPageNormalMode() async {
   await DesktopWindow.setMinWindowSize(const Size(362, 329));
@@ -184,6 +185,8 @@ class _SGLoginState extends State<MyHomePage> with WindowListener {
   TextEditingController loginIDcontroller = new TextEditingController();
   TextEditingController loginPwdcontroller = new TextEditingController();
 
+  final OverlayExample _example = OverlayExample();
+
   @override
   void initState() {
     windowManager.addListener(this);
@@ -272,8 +275,15 @@ class _SGLoginState extends State<MyHomePage> with WindowListener {
     // print("build...!!$readInit");
   }
 
+  Widget showLoadingImage() {
+    return Image.asset(
+      'assets/images/system_loading.gif',
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    _example.context = context;
     return FluentApp(
       title: "fluent ui title test",
       debugShowCheckedModeBanner: false,
