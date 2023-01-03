@@ -1,6 +1,7 @@
 // ignore_for_file: file_names
 
 import 'package:fluent_ui/fluent_ui.dart';
+import 'dart:async';
 import 'package:desktop_window/desktop_window.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart' as materials;
