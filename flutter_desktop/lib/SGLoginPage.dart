@@ -1,3 +1,5 @@
+// ignore_for_file: file_names
+
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:desktop_window/desktop_window.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
@@ -89,10 +91,11 @@ class _MyHomePageState extends State<MyHomePage> {
 }*/
 
 class WindowButtons extends StatelessWidget {
+  const WindowButtons({super.key});
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Color.fromARGB(255, 245, 245, 245),
+      color: const Color.fromARGB(255, 245, 245, 245),
       child: Row(
         //mainAxisAlignment: MainAxisAlignment.end,
         children: [
@@ -126,14 +129,15 @@ class WindowButtons extends StatelessWidget {
 }
 
 class LoginTitleBar extends MoveWindow {
+  LoginTitleBar({super.key});
   @override
   Widget build(BuildContext context) {
     return Container(
       width: 200,
-      color: Color.fromARGB(255, 0, 255, 0),
+      color: const Color.fromARGB(255, 0, 255, 0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
-        children: [
+        children: const [
           SizedBox(
             width: 15,
           ),
@@ -144,13 +148,13 @@ class LoginTitleBar extends MoveWindow {
   }
 }
 
-Widget CreateSGStyleTitleBar() {
+Widget createSGStyleTitleBar() {
   return Container(
-    color: Color.fromARGB(255, 245, 245, 245),
+    color: const Color.fromARGB(255, 245, 245, 245),
     child: Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        SizedBox(
+        const SizedBox(
           width: 13,
         ),
         Image.asset(
@@ -163,7 +167,7 @@ Widget CreateSGStyleTitleBar() {
               width: appWindow.rect.width - 13 - 16 - (34 * 3),
               height: 35,
               child: Container(
-                color: Color.fromARGB(255, 245, 245, 245),
+                color: const Color.fromARGB(255, 245, 245, 245),
                 child: Column(
                   children: [
                     WindowTitleBarBox(child: MoveWindow()),
@@ -174,7 +178,7 @@ Widget CreateSGStyleTitleBar() {
             ),
           ),
         ),
-        WindowButtons(),
+        const WindowButtons(),
       ],
     ),
   );
@@ -182,43 +186,44 @@ Widget CreateSGStyleTitleBar() {
 
 class _SGLoginState extends State<MyHomePage> with WindowListener {
   String _notiMessage = "";
-  TextEditingController loginIDcontroller = new TextEditingController();
-  TextEditingController loginPwdcontroller = new TextEditingController();
+  TextEditingController loginIDcontroller = TextEditingController();
+  TextEditingController loginPwdcontroller = TextEditingController();
 
   final OverlayExample _example = OverlayExample();
 
   @override
   void initState() {
+    SGMaster().initSGMaster();
     windowManager.addListener(this);
 
     Future<bool> readInit = SGHttpReader().readClientInitConfig();
-    print("build...!!");
+    debugPrint("build...!!");
     readInit.then((val) {
-      print(SGMaster().obClientConfig.portForProtocol);
+      debugPrint(SGMaster().obClientConfig.portForProtocol);
       if (SGMaster().obClientConfig.autoUpdateUse == true) {
-        print("Do Update Check");
+        debugPrint("Do Update Check");
       } else {
-        print("bypass update  check");
+        debugPrint("bypass update  check");
       }
 
       if (SGMaster().obClientConfig.findPasswordUse == true &&
           SGMaster().obClientConfig.callSSOActiveXUrlYN == true) {
-        print("find password use");
+        debugPrint("find password use");
         // LoginPageRect(362, 419);
         loginPageFindPwdSSO();
       } else if (SGMaster().obClientConfig.findPasswordUse == true ||
           SGMaster().obClientConfig.callSSOActiveXUrlYN == true) {
-        print("sso login use");
+        debugPrint("sso login use");
         loginPageSSO();
       } else {
-        print("normal");
+        debugPrint("normal");
         loginPageNormalMode();
       }
     }).catchError((error) {
       // error가 해당 에러를 출력
-      print('error: $error');
+      debugPrint('error: $error');
     });
-    print("init #1");
+    debugPrint("init #1");
     super.initState();
   }
 
@@ -230,7 +235,7 @@ class _SGLoginState extends State<MyHomePage> with WindowListener {
 
   @override
   void onWindowEvent(String eventName) {
-    print('[WindowManager] onWindowEvent: $eventName');
+    debugPrint('[WindowManager] onWindowEvent: $eventName');
   }
 
   @override
@@ -243,12 +248,12 @@ class _SGLoginState extends State<MyHomePage> with WindowListener {
     setState(() {});
   }
 
-  BorderSide _kDefaultRoundedBorderSide = BorderSide(
+  final BorderSide _kDefaultRoundedBorderSide = const BorderSide(
     style: BorderStyle.solid,
     width: 0.8,
   );
 
-  Future LoginPageRect(double w, double h) async {
+  Future loginPageRect(double w, double h) async {
     final initialSize = Size(w, h);
     appWindow.minSize = initialSize;
     appWindow.maxSize = initialSize;
@@ -263,15 +268,19 @@ class _SGLoginState extends State<MyHomePage> with WindowListener {
     SGHttpReader sgReader = SGHttpReader();
     bool readclientID = await sgReader.requestClientID();
 
-    print('readclientID: $readclientID');
+    debugPrint('readclientID: $readclientID');
     if (readclientID == false) {
       return;
     }
-    print(SGMaster().obClientConfig.autoUpdateUse);
-    print(SGMaster().obClientConfig.callSSOActiveXUrlYN);
-    print(SGMaster().obClientConfig.clientDebugMode);
+
+    debugPrint(
+        'auto update use: ${SGMaster().obClientConfig.autoUpdateUse == true ? "true" : "false"} ');
+    debugPrint(
+        'callSSOActiveXUrlYN: ${SGMaster().obClientConfig.callSSOActiveXUrlYN == true ? 'true' : 'false'}');
+    debugPrint('clientDebugMode: ${SGMaster().obClientConfig.clientDebugMode}');
 
     // bool readInit = await SGHttpReader().readClientInitConfig();
+
     // print("build...!!$readInit");
   }
 
@@ -289,15 +298,16 @@ class _SGLoginState extends State<MyHomePage> with WindowListener {
       debugShowCheckedModeBanner: false,
       home: Container(
         width: 362,
-        color: Color.fromARGB(255, 255, 255, 255),
+        color: const Color.fromARGB(255, 255, 255, 255),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Container(
                 decoration: BoxDecoration(
                     border: Border.all(
-                        width: 1, color: Color.fromARGB(255, 170, 170, 170))),
-                child: CreateSGStyleTitleBar()),
+                        width: 1,
+                        color: const Color.fromARGB(255, 170, 170, 170))),
+                child: createSGStyleTitleBar()),
             Container(
               padding: const EdgeInsets.only(
                   left: 25, top: 31, bottom: 25, right: 25),
@@ -309,9 +319,10 @@ class _SGLoginState extends State<MyHomePage> with WindowListener {
                   fit: BoxFit.fitWidth,
                 ),
                 Container(
-                  //height: 32,
-                  color: Color.fromARGB(255, 255, 255, 255), // Colors.white,
-                  child: Text('$_notiMessage'),
+                  // height: 32,
+                  color:
+                      const Color.fromARGB(255, 255, 255, 255), // Colors.white,
+                  child: Text(_notiMessage),
                 ),
                 TextBox(
                   controller: loginIDcontroller,
@@ -329,7 +340,7 @@ class _SGLoginState extends State<MyHomePage> with WindowListener {
                       right: _kDefaultRoundedBorderSide,
                     ),
                     borderRadius:
-                        BorderRadius.vertical(top: Radius.circular(3.0)),
+                        const BorderRadius.vertical(top: Radius.circular(3.0)),
                   ),
                 ),
                 const SizedBox(
@@ -360,15 +371,15 @@ class _SGLoginState extends State<MyHomePage> with WindowListener {
                       borderRadius:
                           const BorderRadius.all(Radius.circular(7.0))),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
                 SizedBox(
                   width: double.infinity,
                   height: 50,
                   child: materials.ElevatedButton(
-                      child: Text("Login", textAlign: TextAlign.center),
-                      onPressed: requestLogin),
+                      onPressed: requestLogin,
+                      child: const Text("Login", textAlign: TextAlign.center)),
                 ),
               ]),
             ),

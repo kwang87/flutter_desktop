@@ -1,4 +1,6 @@
-const int SUCCESS_WEB = 0; //>통신성공
+// ignore_for_file: file_names
+
+const int successWeb = 0; //>통신성공
 
 enum SGHttpErrorCode {
   successWeb, // OK

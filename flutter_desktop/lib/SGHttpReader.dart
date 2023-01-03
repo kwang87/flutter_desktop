@@ -34,8 +34,8 @@ class SGHttpReader {
 
   Future<bool> readClientInitConfig() async {
     debugPrint('enter readClientInitConfig');
-    String response = await _callAPI('/api/xml/getClientInitConfig');
-
+    String response = await _callAPI('/api/json/getClientInitConfig');
+    // final initConfigs = jsonDecode(response);
     debugPrint('val: $response');
     SGMaster().parseClientInitConifg(response);
     return true;
@@ -86,16 +86,16 @@ class SGHttpReader {
 
     int currenttime = SystemClock.elapsedRealtime().inMilliseconds;
     currenttime = 1387346500;
-    String hmac = '$url?rd=$randomKey${currenttime}';
-    var hmac_ori_byte = utf8.encode(hmac);
+    String hmac = '$url?rd=$randomKey$currenttime';
+    var hmacOriByte = utf8.encode(hmac);
     var hmacSha256 = Hmac(sha256, key);
-    var digest = hmacSha256.convert(hmac_ori_byte);
+    var digest = hmacSha256.convert(hmacOriByte);
 
     var encoded = base64.encode(digest.bytes);
 
     String hmac2 = encoded.toString().replaceAll('+', '-');
     hmac2 = hmac2.replaceAll('/', '_');
-    String param = 'rd=${randomKey}&hmac=${hmac2}&timestamp=${currenttime}';
+    String param = 'rd=$randomKey&hmac=$hmac2&timestamp=$currenttime';
     String response = await _callPOST(url, param);
     if (_responseIsError(response) == SGHttpErrorCode.successWeb) {
       // do parse data
@@ -105,18 +105,17 @@ class SGHttpReader {
     response = response.toString().replaceAll('_', '/');
     var basedecd = base64.decode(response);
     //base64 decode
-
     final deckey = enc.Key.fromUtf8(encKey);
     final encrypter = enc.Encrypter(enc.AES(deckey, mode: enc.AESMode.cbc));
 
     final iv = enc.IV.fromUtf8(encKey.substring(0, 16));
     final decrypted2 = encrypter.decryptBytes(enc.Encrypted(basedecd), iv: iv);
 
-    print(utf8.decode(decrypted2));
+    debugPrint(utf8.decode(decrypted2));
     bool b = SGMaster().parseInstallClient(utf8.decode(decrypted2));
 
     if (b == true) {
-      print('Do after installClient work');
+      debugPrint('Do after installClient work');
     }
     return true;
   }
@@ -142,7 +141,7 @@ class SGHttpReader {
   Future<String> _callAPI(String webUrl) async {
     var url = Uri.parse('https://$currentServerIP:$currentServerPort$webUrl');
 
-    var response = await http.get(url);
+    final response = await http.get(url);
     String result = response.body.substring(8, response.body.length - 9);
     return result;
   }
@@ -164,9 +163,9 @@ class SGHttpReader {
       debugPrint('status code: ${response.statusCode}');
       // return '';
     }
-    print("response: ${response.body}");
+    debugPrint("response: ${response.body}");
     String result = response.body.substring(8, response.body.length - 9);
-    print("result: ${result}");
+    debugPrint("result: $result");
     return result;
   }
 

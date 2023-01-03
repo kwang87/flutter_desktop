@@ -1,4 +1,6 @@
 // import 'package:fluent_ui/fluent_ui.dart';
+// ignore_for_file: file_names
+
 import 'package:flutter/material.dart';
 
 class Alert extends StatefulWidget {
@@ -17,8 +19,8 @@ class _AlertState extends State<Alert> with SingleTickerProviderStateMixin {
     super.initState();
 
     _controller =
-        AnimationController(vsync: this, duration: Duration(seconds: 1));
-    _animation = Tween<Offset>(begin: Offset(0.0, -1.0), end: Offset.zero)
+        AnimationController(vsync: this, duration: const Duration(seconds: 1));
+    _animation = Tween<Offset>(begin: const Offset(0.0, -1.0), end: Offset.zero)
         .animate(
             CurvedAnimation(parent: _controller, curve: Curves.fastOutSlowIn));
 
@@ -46,7 +48,7 @@ class _AlertState extends State<Alert> with SingleTickerProviderStateMixin {
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                     color: Colors.red, borderRadius: BorderRadius.circular(30)),
-                child: Text(
+                child: const Text(
                   'Alert',
                   style: TextStyle(
                       color: Colors.white, fontWeight: FontWeight.bold),
@@ -107,7 +109,8 @@ class _ToastState extends State<Toast> with SingleTickerProviderStateMixin {
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(20),
                       color: Colors.grey),
-                  child: Text('Toast', style: TextStyle(color: Colors.white))),
+                  child: const Text('Toast',
+                      style: TextStyle(color: Colors.white))),
             ),
           ),
         ),
@@ -120,20 +123,20 @@ class OverlayExample {
   late BuildContext context;
 
   void showAlert() async {
-    OverlayEntry _overlay = OverlayEntry(builder: (_) => const Alert());
+    OverlayEntry overlay = OverlayEntry(builder: (_) => const Alert());
 
-    Navigator.of(context).overlay!.insert(_overlay);
+    Navigator.of(context).overlay!.insert(overlay);
 
     await Future.delayed(const Duration(seconds: 1));
-    _overlay.remove();
+    overlay.remove();
   }
 
   void toast() async {
-    OverlayEntry _overlay = OverlayEntry(builder: (_) => const Toast());
+    OverlayEntry overlay = OverlayEntry(builder: (_) => const Toast());
 
-    Navigator.of(context).overlay!.insert(_overlay);
+    Navigator.of(context).overlay!.insert(overlay);
 
     await Future.delayed(const Duration(seconds: 2));
-    _overlay.remove();
+    overlay.remove();
   }
 }

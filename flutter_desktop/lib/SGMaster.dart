@@ -1,57 +1,49 @@
-import 'dart:convert';
-import 'package:flutter/cupertino.dart';
-import 'package:http/http.dart';
+// ignore_for_file: file_names
 
+import 'package:flutter/cupertino.dart';
+
+import 'dart:convert';
 import 'SGClientConfig.dart';
-import 'SGHttpReader.dart';
 import 'package:xml/xml.dart';
 
 class SGMaster {
-  SGMaster._privateConstructor() {
-    // SGHttpReader().readClientInitConfig();
-  }
+  SGMaster._privateConstructor();
 
   static final SGMaster _instance = SGMaster._privateConstructor();
   factory SGMaster() {
     return _instance;
   }
 
-  void InitSGMaster() {
-    obClientConfig = SGClientConfig(
-        portForProtocol: "9321|9325",
-        clientDebugMode: "N",
-        clientConnectTool: "Y,Y,Y,Y",
-        clientConfigUse: true,
-        integrityCheckOption: "L",
-        callSSOActiveXUrlYN: false,
-        ssoServiceMethod: "INISAFE_NEXESS_V2_ACTIVEX",
-        findPasswordUse: false,
-        findPasswordServiceCode: "SMS,EMAIL,MESSENGER",
-        customLoginLogoImageBinary: "",
-        customTopLogoImageBinary: "",
-        autoUpdateUse: true,
-        serverConfigOption: "E");
+  void initSGMaster() {
+    obClientConfig = SGClientConfig.createDefaultConfig();
   }
 
   late SGClientConfig obClientConfig;
   void parseClientInitConifg(String body) {
-    obClientConfig = SGClientConfig.fromXMLString(body);
+    dynamic configData = jsonDecode(body);
+    dynamic configResponse = configData["data"];
+    Map<String, dynamic> configRes = configResponse["response"];
+
+    debugPrint("before from json: ${obClientConfig.manuals}");
+
+    obClientConfig = SGClientConfig.fromJson(configRes);
+    debugPrint("after from json: ${obClientConfig.manuals}");
   }
 
   bool parseInstallClient(String body) {
-    XmlDocument? XmlData;
-    XmlData = XmlDocument.parse(body);
+    XmlDocument? xmlData;
+    xmlData = XmlDocument.parse(body);
     clientID =
-        XmlData.findAllElements('clientId').map((e) => e.text).toString();
-    String result_code =
-        XmlData.findAllElements('resultCode').map((e) => e.text).toString();
+        xmlData.findAllElements('clientId').map((e) => e.text).toString();
+    String resultCode =
+        xmlData.findAllElements('resultCode').map((e) => e.text).toString();
 
     // XmlData
-    print('clientID: $clientID');
+    debugPrint('clientID: $clientID');
     clientID = clientID.substring(1, clientID.length - 1);
-    print('result: $result_code');
-    print('clientID: $clientID');
-    if (result_code == 'true') {
+    debugPrint('result: $resultCode');
+    debugPrint('clientID: $clientID');
+    if (resultCode == 'true') {
       return true;
     }
 
